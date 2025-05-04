@@ -1,0 +1,29 @@
+services:
+  - type: web
+    name: appapiv1
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        sync: false
+      - key: TURSO_DB_URL
+        sync: false
+      - key: TURSO_DB_AUTH_TOKEN
+        sync: false
+      - key: NEXT_PUBLIC_API
+        sync: false
+      - key: FOOTBALL_API_KEY
+        sync: false
+      - key: RAPID_API_KEY
+        sync: false
+      - key: COO_API_KEY
+        sync: false
+      - key: THE_ODDS_APIKEY
+        sync: false
+      - key: ETHEREUM_RPC_URL
+        sync: false 
