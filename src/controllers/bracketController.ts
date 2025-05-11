@@ -550,6 +550,38 @@ export class BracketController {
             res.status(500).json({ error: 'Failed to fetch team brackets' });
         }
     }
+
+    async getLatestFinalsBracket(req: Request, res: Response) {
+        try {
+            // Query to get the latest round 5 bracket
+            const result = await this.tursoClient.executeQuery(
+                `SELECT tb.bracket_id, tb.tournament_id 
+                FROM team_brackets tb
+                JOIN (
+                    SELECT tournament_id 
+                    FROM team_brackets 
+                    WHERE stage = 5 
+                    ORDER BY tournament_id DESC 
+                    LIMIT 1
+                ) latest ON tb.tournament_id = latest.tournament_id
+                WHERE tb.stage = 5
+                LIMIT 1`,
+                []
+            );
+
+            if (result.rows.length === 0) {
+                return res.status(404).json({ error: 'No finals bracket found' });
+            }
+
+            res.json({
+                tournament_id: result.rows[0].tournament_id,
+                bracket_id: result.rows[0].bracket_id
+            });
+        } catch (error) {
+            console.error('getLatestFinalsBracket error:', error);
+            res.status(500).json({ error: 'Failed to fetch latest finals bracket' });
+        }
+    }
 }
 
 function formatDate(dateString: string): string {

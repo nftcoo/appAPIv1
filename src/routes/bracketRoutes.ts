@@ -20,4 +20,9 @@ router.post('/teams', authenticateToken, async (req: Request, res: Response): Pr
     await bracketController.getTeamBrackets(req, res);
 });
 
+// New route for latest finals bracket ID
+router.get('/finals/latest-id', authenticateToken, async (req: Request, res: Response): Promise<void> => {
+    await bracketController.getLatestFinalsBracket(req, res);
+});
+
 export default router; 

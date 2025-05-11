@@ -84,11 +84,41 @@ export class UserController {
         return;
       }
 
-      // Update the user's favorite team using parameterized query
-      await this.tursoClient.executeQuery(
-        'UPDATE app_users SET team_id = ?, team_image_url = ? WHERE wallet_address = ?',
-        [teamId, metadata.image || '', wallet]
-      );
+      // Commenting out the TursoClient update for now
+      // const updateResult = await this.tursoClient.executeQuery(
+      //   'UPDATE app_users SET team_id = ?, team_image_url = ? WHERE wallet_address = ?',
+      //   [teamId, metadata.image || '', wallet]
+      // );
+      // console.log('Update result:', JSON.stringify(updateResult, null, 2));
+
+      // Direct fetch to Turso HTTP API
+      const url = process.env.NEXT_PUBLIC_URL_FOUR;
+      const authToken = process.env.NEXT_PUBLIC_TOKEN_FOUR;
+      const fetchResponse = await fetch(`${url}/v2/pipeline`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${authToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          requests: [
+            {
+              type: "execute",
+              stmt: {
+                sql: "UPDATE app_users SET team_id = ?, team_image_url = ? WHERE wallet_address = ?",
+                args: [
+                  { type: "integer", value: teamId.toString() },
+                  { type: "text", value: metadata.image || "" },
+                  { type: "text", value: wallet }
+                ]
+              }
+            },
+            { type: "close" }
+          ]
+        })
+      });
+      const data = await fetchResponse.json();
+      console.log('Raw Turso response:', JSON.stringify(data, null, 2));
 
       console.log('Updated favorite team in database');
 
